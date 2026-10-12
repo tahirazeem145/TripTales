@@ -4,6 +4,9 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { connectDB } from './config/db.js';
 
+import authRoutes from './routes/authRoutes.js';
+import postRoutes from './routes/postRoutes.js';
+
 // 1. Load environment variables from .env file
 dotenv.config();
 
@@ -18,17 +21,20 @@ const app = express();
 app.use(cors());
 
 // Parses incoming JSON request bodies (e.g. req.body in POST requests)
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 // Parses URL-encoded data from HTML form submissions
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // HTTP request logger for development (prints method, URL, status code, response time)
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
-// 5. Basic Routes
+// 5. Mount API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/posts', postRoutes);
+
 app.get('/', (req, res) => {
   res.json({
     message: 'Welcome to TripTales API 🌍✈️',
